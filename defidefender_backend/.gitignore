@@ -3,3 +3,5 @@
 # dependencies
 /build
 /.idea
+/out
+/gradle
