@@ -1,8 +1,11 @@
 package org.bithacks.defidefender.utils;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.webank.weid.constant.JsonSchemaConstant;
 import com.webank.weid.protocol.base.CredentialPojo;
+import com.webank.weid.protocol.base.PresentationE;
 
 import java.io.*;
 import java.util.HashMap;
@@ -57,8 +60,9 @@ public class CommonUtils {
     }
 
 
-    public void writeObjectToFile(CredentialPojo obj, int type) {
-        File file = new File(type == 0 ? "credential.dat" : "selectiveCredential.dat");
+    public static void writeObjectToFile(CredentialPojo obj, String weid, int type) {
+        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "_";
+        File file = new File(type == 0 ? path + "credential.dat" : path + "selectiveCredential.dat");
         FileOutputStream out;
         try {
             out = new FileOutputStream(file);
@@ -73,9 +77,10 @@ public class CommonUtils {
         }
     }
 
-    public CredentialPojo readObjectFromFile(int type) {
+    public static CredentialPojo readObjectFromFile(String weid, int type) {
+        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "_";
         CredentialPojo temp = null;
-        File file = new File(type == 0 ? "credential.dat" : "selectiveCredential.dat");
+        File file = new File(type == 0 ? path + "credential.dat" : path + "selectiveCredential.dat");
         FileInputStream in;
         try {
             in = new FileInputStream(file);
@@ -90,6 +95,48 @@ public class CommonUtils {
             e.printStackTrace();
         }
         return temp;
+    }
+
+    public static void writePresentationToFile(PresentationE obj, String weid) {
+        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "_";
+        File file = new File(path + "presentation.dat");
+        FileOutputStream out;
+        try {
+            out = new FileOutputStream(file);
+            ObjectOutputStream objOut = new ObjectOutputStream(out);
+            objOut.writeObject(obj);
+            objOut.flush();
+            objOut.close();
+            System.out.println("write presentation success!");
+        } catch (IOException e) {
+            System.out.println("write presentation failed");
+            e.printStackTrace();
+        }
+    }
+
+    public static PresentationE readPresentationFromFile(String weid) {
+        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "_";
+        PresentationE temp = null;
+        File file = new File(path + "presentation.dat");
+        FileInputStream in;
+        try {
+            in = new FileInputStream(file);
+            ObjectInputStream objIn = new ObjectInputStream(in);
+            temp = (PresentationE) objIn.readObject();
+            objIn.close();
+            System.out.println("read presentation success!");
+        } catch (IOException e) {
+            System.out.println("read presentation failed");
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return temp;
+    }
+
+    public static HashMap<String, Object> convertJsonToMap(String jsonStr) {
+        HashMap map = JSON.parseObject(jsonStr, HashMap.class);
+        return map;
     }
 
 }

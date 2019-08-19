@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "this is CPT issued by government",
+  "title": "Government CPT",
+  "type": "object",
+  "properties": {
+    "weid": {
+      "type": "string",
+      "description": "user weId"
+    },
+    "name": {
+      "type": "string",
+      "description": "user actual name"
+    },
+    "gender": {
+      "description": "the gender of certificate owner",
+      "enum": [
+        "F",
+        "M"
+      ],
+      "type": "string"
+    },
+    "birthday": {
+      "description": "the birthday of certificate owner",
+      "type": "string"
+    },
+    "address": {
+      "description": "the address of certificate owner",
+      "type": "string"
+    },
+    "identityNumber": {
+      "type": "string",
+      "description": "the identityNumber of certificate owner"
+    }
+  },
+  "required": [
+    "name",
+    "gender",
+    "birthday",
+    "address",
+    "identityNumber"
+  ]
+}
