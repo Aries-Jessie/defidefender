@@ -1,7 +1,6 @@
 package org.bithacks.defidefender.service;
 
-import com.webank.weid.protocol.base.CptBaseInfo;
-import com.webank.weid.protocol.response.ResponseData;
+import org.bithacks.defidefender.contract.Certification;
 import org.bithacks.defidefender.utils.SuperResult;
 
 public interface CommonService {
@@ -12,4 +11,12 @@ public interface CommonService {
     SuperResult getCredential(String jsonStr);
 
     SuperResult getPresentation(String jsonStr);
+
+    void initializeNetwork();
+
+    String deployCertification();
+
+    Certification getCertification();
+
+    SuperResult getCPTById(String jsonStr);
 }

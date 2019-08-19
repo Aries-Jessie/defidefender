@@ -6,8 +6,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.webank.weid.constant.JsonSchemaConstant;
 import com.webank.weid.protocol.base.CredentialPojo;
 import com.webank.weid.protocol.base.PresentationE;
+import org.bithacks.defidefender.model.Po.LoanRecord;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 public class CommonUtils {
@@ -61,7 +64,8 @@ public class CommonUtils {
 
 
     public static void writeObjectToFile(CredentialPojo obj, String weid, int type) {
-        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "_";
+        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "/";
+        FileUtil.checkDir(path);
         File file = new File(type == 0 ? path + "credential.dat" : path + "selectiveCredential.dat");
         FileOutputStream out;
         try {
@@ -78,7 +82,7 @@ public class CommonUtils {
     }
 
     public static CredentialPojo readObjectFromFile(String weid, int type) {
-        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "_";
+        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "/";
         CredentialPojo temp = null;
         File file = new File(type == 0 ? path + "credential.dat" : path + "selectiveCredential.dat");
         FileInputStream in;
@@ -98,7 +102,8 @@ public class CommonUtils {
     }
 
     public static void writePresentationToFile(PresentationE obj, String weid) {
-        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "_";
+        String path = ConstantFields.PRESENTATION_DIR + weid.substring(11) + "/";
+        FileUtil.checkDir(path);
         File file = new File(path + "presentation.dat");
         FileOutputStream out;
         try {
@@ -115,7 +120,7 @@ public class CommonUtils {
     }
 
     public static PresentationE readPresentationFromFile(String weid) {
-        String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "_";
+        String path = ConstantFields.PRESENTATION_DIR + weid.substring(11) + "/";
         PresentationE temp = null;
         File file = new File(path + "presentation.dat");
         FileInputStream in;
@@ -137,6 +142,17 @@ public class CommonUtils {
     public static HashMap<String, Object> convertJsonToMap(String jsonStr) {
         HashMap map = JSON.parseObject(jsonStr, HashMap.class);
         return map;
+    }
+
+    public static String generateDate() {
+        Date date = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd");
+        String format = sdf.format(date);
+        return format;
+    }
+
+    public static String generateBlacklistRecord(LoanRecord record) {
+        return "应该于" + record.getExpiredDate() + "还款" + record.getAmount() + "万元，但逾期未换";
     }
 
 }

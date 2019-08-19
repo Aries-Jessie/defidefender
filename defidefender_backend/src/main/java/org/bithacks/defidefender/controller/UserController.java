@@ -1,7 +1,5 @@
 package org.bithacks.defidefender.controller;
 
-import com.webank.weid.protocol.response.CreateWeIdDataResult;
-import com.webank.weid.protocol.response.ResponseData;
 import org.bithacks.defidefender.service.UserService;
 import org.bithacks.defidefender.utils.SuperResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +16,10 @@ public class UserController {
     private UserService userService;
 
     @RequestMapping(value = "/createWeId", method = RequestMethod.POST)
-    public SuperResult createWeId() {
+    public SuperResult createWeId(@RequestBody String jsonStr) {
         System.out.println("Create WeId Request");
-        ResponseData<CreateWeIdDataResult> response = userService.createWeId();
-        return SuperResult.ok(response);
+        SuperResult result = userService.createWeId(jsonStr);
+        return result;
     }
 
     @RequestMapping(value = "/createSelectiveCredential", method = RequestMethod.POST)
@@ -35,6 +33,48 @@ public class UserController {
     public SuperResult createPresentation(@RequestBody String jsonStr) {
         System.out.println("Create Presentation Request");
         SuperResult result = userService.createPresentation(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/requestVerifyWeId", method = RequestMethod.POST)
+    public SuperResult requestVerifyWeId(@RequestBody String jsonStr) {
+        System.out.println("Request VerifyWeId Request");
+        SuperResult result = userService.requestVerifyWeId(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/getCompanies", method = RequestMethod.GET)
+    public SuperResult getCompanies() {
+        System.out.println("Get Companies Request");
+        SuperResult result = userService.getCompanies();
+        return result;
+    }
+
+    @RequestMapping(value = "/requestLoan", method = RequestMethod.POST)
+    public SuperResult requestLoan(@RequestBody String jsonStr) {
+        System.out.println("Request Loan Request");
+        SuperResult result = userService.requestLoan(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/listLoanRequests", method = RequestMethod.POST)
+    public SuperResult listLoanRequests(@RequestBody String jsonStr) {
+        System.out.println("List Loan Request");
+        SuperResult result = userService.listLoanRequests(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/listLoanRecords", method = RequestMethod.POST)
+    public SuperResult listLoanRecords(@RequestBody String jsonStr) {
+        System.out.println("List Loan Records Request");
+        SuperResult result = userService.listLoanRecords(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/returnLoan", method = RequestMethod.POST)
+    public SuperResult returnLoan(@RequestBody String jsonStr) {
+        System.out.println("Return Loan Request");
+        SuperResult result = userService.returnLoan(jsonStr);
         return result;
     }
 

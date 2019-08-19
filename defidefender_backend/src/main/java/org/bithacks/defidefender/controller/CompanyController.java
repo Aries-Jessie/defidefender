@@ -28,4 +28,55 @@ public class CompanyController {
         SuperResult result = companyService.verifyCredential(jsonStr);
         return result;
     }
+
+    @RequestMapping(value = "/addWeidToBlacklist", method = RequestMethod.POST)
+    public SuperResult addWeidToBlacklist(@RequestBody String jsonStr) {
+        System.out.println("Add WeidToBlacklist Request");
+        SuperResult result = companyService.addWeidToBlacklist(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/listBlacklist", method = RequestMethod.GET)
+    public SuperResult listBlacklist() {
+        System.out.println("List blacklist Request");
+        SuperResult result = companyService.listBlacklist();
+        return result;
+    }
+
+    @RequestMapping(value = "/listBlacklistByWeid", method = RequestMethod.POST)
+    public SuperResult listBlacklistByWeid(@RequestBody String jsonStr) {
+        System.out.println("List blacklist by weid Request");
+        SuperResult result = companyService.listBlacklistByWeid(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/listLoanRequestRecords", method = RequestMethod.POST)
+    public SuperResult listLoanRequestRecords(@RequestBody String jsonStr) {
+        System.out.println("List LoanRequest Records by companyName Request");
+        companyService.checkLoanStatus();
+        SuperResult result = companyService.listLoanRequestRecords(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/handleLoanRequest", method = RequestMethod.POST)
+    public SuperResult handleLoanRequest(@RequestBody String jsonStr) {
+        System.out.println("Handle Loan Request");
+        SuperResult result = companyService.handleLoanRequest(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/addToBlacklist", method = RequestMethod.POST)
+    public SuperResult addToBlacklist(@RequestBody String jsonStr) {
+        System.out.println("Add to Blacklist Request");
+        SuperResult result = companyService.addToBlacklist(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/listLoanRecords", method = RequestMethod.POST)
+    public SuperResult listLoanRecords(@RequestBody String jsonStr) {
+        System.out.println("List Loan Records by companyName Request");
+        companyService.checkLoanStatus();
+        SuperResult result = companyService.listLoanRecords(jsonStr);
+        return result;
+    }
 }

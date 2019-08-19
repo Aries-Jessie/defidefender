@@ -10,12 +10,15 @@ import com.webank.weid.protocol.response.CreateWeIdDataResult;
 import com.webank.weid.protocol.response.ResponseData;
 import com.webank.weid.rpc.*;
 import com.webank.weid.service.impl.*;
+import org.bithacks.defidefender.dao.IssuedCredentialRepository;
+import org.bithacks.defidefender.model.Po.IssuedCredential;
 import org.bithacks.defidefender.service.DIDService;
 import org.bithacks.defidefender.utils.CommonUtils;
 import org.bithacks.defidefender.utils.ConstantFields;
 import org.bithacks.defidefender.utils.PrivateKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -36,6 +39,9 @@ public class DIDServiceImpl implements DIDService {
     private WeIdService weIdService = new WeIdServiceImpl();
 
     private CredentialPojoService credentialPojoService = new CredentialPojoServiceImpl();
+
+    @Autowired
+    private IssuedCredentialRepository issuedCredentialRepository;
 
     /**
      * set validity period to 360 days by default.
@@ -205,6 +211,7 @@ public class DIDServiceImpl implements DIDService {
         ResponseData<CredentialPojo> response = credentialPojoService.createCredential(createCredentialPojoArgs);
         // 保存凭证
         CommonUtils.writeObjectToFile(response.getResult(), claimData.get("weid").toString(), 0);
+        issuedCredentialRepository.save(new IssuedCredential(claimData.get("weid").toString()));
         return response;
     }
 
@@ -261,5 +268,11 @@ public class DIDServiceImpl implements DIDService {
         CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, type);
         ResponseData<Boolean> verifyResult = credentialPojoService.verify(issuer, credentialPojo);
         return verifyResult;
+    }
+
+    @Override
+    public ResponseData<Cpt> getCptById(int cptId) {
+        ResponseData<Cpt> response = cptService.queryCpt(cptId);
+        return response;
     }
 }

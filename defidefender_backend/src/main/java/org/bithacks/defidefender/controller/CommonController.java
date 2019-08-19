@@ -42,4 +42,19 @@ public class CommonController {
         SuperResult result = commonService.getPresentation(jsonStr);
         return result;
     }
+
+    @RequestMapping(value = "/getCPTById", method = RequestMethod.POST)
+    public SuperResult getCPTById(@RequestBody String jsonStr) {
+        System.out.println("Get Presentation Request");
+        SuperResult result = commonService.getCPTById(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/initializeAndDeploy", method = RequestMethod.POST)
+    public SuperResult initializeAndDeploy() {
+        System.out.println("initializeAndDeploy Request");
+        commonService.initializeNetwork();
+        String address = commonService.deployCertification();
+        return SuperResult.ok(address);
+    }
 }

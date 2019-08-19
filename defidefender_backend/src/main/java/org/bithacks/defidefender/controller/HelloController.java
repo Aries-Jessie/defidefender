@@ -24,12 +24,6 @@ public class HelloController {
         return "Create Success";
     }
 
-    @RequestMapping(value = "/findByName")
-    public String findByName() {
-        Contract contract = contractRepository.findByName("weid");
-        return contract.getAddress();
-    }
-
     @RequestMapping(value = "/")
     public String hello() {
         return "Success";

@@ -119,3 +119,7 @@ java.lang.ClassCastException: java.lang.Integer cannot be cast to java.util.Hash
 2019-08-19 13:12:54.480 [http-nio-8080-exec-6] ERROR CredentialPojoServiceImpl() - [verify] presentation verify failed, error message : input parameter is illegal.
 2019-08-19 13:12:54.480 [http-nio-8080-exec-6] ERROR CredentialPojoServiceImpl() - [verify] checkInputArgs fail.
 2019-08-19 13:16:19.004 [http-nio-8080-exec-9] ERROR CredentialPojoServiceImpl() - [verify] The input issuer weid is not match the credential's.
+2019-08-19 16:31:41.797 [http-nio-8080-exec-1] ERROR CptServiceEngineV2() - Query cpt id : 20000 does not exist.
+2019-08-19 16:31:49.718 [http-nio-8080-exec-2] ERROR CptServiceEngineV2() - Query cpt id : 200000 does not exist.
+2019-08-19 16:31:52.827 [http-nio-8080-exec-8] ERROR CptServiceEngineV2() - Query cpt id : 2000 does not exist.
+2019-08-19 19:53:26.352 [nioEventLoopGroup-2-1] ERROR ChannelHandler() - event:READER_IDLE connect127.0.0.1:20200 long time Inactive，disconnect

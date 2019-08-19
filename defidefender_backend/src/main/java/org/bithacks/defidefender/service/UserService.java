@@ -1,13 +1,23 @@
 package org.bithacks.defidefender.service;
 
-import com.webank.weid.protocol.response.CreateWeIdDataResult;
-import com.webank.weid.protocol.response.ResponseData;
 import org.bithacks.defidefender.utils.SuperResult;
 
 public interface UserService {
-    ResponseData<CreateWeIdDataResult> createWeId();
+    SuperResult createWeId(String jsonStr);
 
     SuperResult createSelectiveCredential(String jsonStr);
 
     SuperResult createPresentation(String jsonStr);
+
+    SuperResult requestVerifyWeId(String jsonStr);
+
+    SuperResult getCompanies();
+
+    SuperResult requestLoan(String jsonStr);
+
+    SuperResult listLoanRequests(String jsonStr);
+
+    SuperResult listLoanRecords(String jsonStr);
+
+    SuperResult returnLoan(String jsonStr);
 }

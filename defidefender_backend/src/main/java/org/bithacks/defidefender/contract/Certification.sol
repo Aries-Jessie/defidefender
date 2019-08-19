@@ -3,7 +3,7 @@ pragma solidity ^0.4.0;
 contract Certification {
 
     //event
-    event AddBlacklistEntityEvent(string recordId, string weid, string record, string publisher, string createdTime)
+    event AddBlacklistEntityEvent(string recordId, string weid, string record, string publisher, string createdTime);
 
     struct BlacklistEntity {
         string entityId; // 唯一id
@@ -19,7 +19,7 @@ contract Certification {
 
     function addBlacklistEntity(string entityId, string weid, string record, string publisher, string createdTime) public returns (uint256){
         BlacklistEntity memory entity = BlacklistEntity({
-            recordId : entityId,
+            entityId : entityId,
             weid : weid,
             record : record,
             publisher : publisher,
