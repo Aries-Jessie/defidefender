@@ -1,5 +1,8 @@
 package org.bithacks.defidefender.utils;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ConstantFields {
 
     public static final String KEY_DIR = PropertiesUtils.getProperty("weid.keys.dir");

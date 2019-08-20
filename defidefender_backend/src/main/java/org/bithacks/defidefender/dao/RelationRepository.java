@@ -9,4 +9,6 @@ public interface RelationRepository extends JpaRepository<Relation, Integer> {
     List<Relation> findRelationsByName(String name);
 
     List<Relation> findRelationsByType(int type);
+
+    List<Relation> findRelationsByWeid(String weid);
 }

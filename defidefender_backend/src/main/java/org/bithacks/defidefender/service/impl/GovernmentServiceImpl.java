@@ -3,8 +3,11 @@ package org.bithacks.defidefender.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.webank.weid.protocol.base.CredentialPojo;
 import com.webank.weid.protocol.response.ResponseData;
+import org.bithacks.defidefender.dao.CredentialRepository;
 import org.bithacks.defidefender.dao.IssuedCredentialRepository;
+import org.bithacks.defidefender.dao.RelationRepository;
 import org.bithacks.defidefender.dao.UserRepository;
+import org.bithacks.defidefender.model.Po.Credential;
 import org.bithacks.defidefender.model.Po.IssuedCredential;
 import org.bithacks.defidefender.model.Po.User;
 import org.bithacks.defidefender.service.DIDService;
@@ -15,7 +18,9 @@ import org.bithacks.defidefender.utils.PrivateKeyUtil;
 import org.bithacks.defidefender.utils.SuperResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,13 +36,20 @@ public class GovernmentServiceImpl implements GovernmentService {
     @Autowired
     private IssuedCredentialRepository issuedCredentialRepository;
 
+    @Autowired
+    private RelationRepository relationRepository;
+
+    @Autowired
+    private CredentialRepository credentialRepository;
+
     @Override
     public SuperResult createCredential(String jsonStr) {
         try {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             int cptId = jsonObject.getInteger(ConstantFields.USER_CREDENTIAL_CPTID);
             String issuer = jsonObject.getString(ConstantFields.USER_CREDENTIAL_ISSUER);
-            String privateKey = PrivateKeyUtil.getPrivateKeyByWeId(ConstantFields.KEY_DIR, issuer);
+            String privateKey = relationRepository.findRelationsByWeid(issuer).get(0).getPrivateKey();
+//            String privateKey = PrivateKeyUtil.getPrivateKeyByWeId(ConstantFields.KEY_DIR, issuer);
             JSONObject claimDataObject = (JSONObject) jsonObject.get(ConstantFields.USER_CREDENTIAL_CLAIMDATA);
             HashMap<String, Object> claimData = CommonUtils.convertJsonToMap(claimDataObject.toJSONString());
             ResponseData<CredentialPojo> response = weIdService.createCredential(cptId, issuer, privateKey, claimData);
@@ -78,7 +90,7 @@ public class GovernmentServiceImpl implements GovernmentService {
 
     @Override
     public SuperResult listIssuedCredentials() {
-        List<IssuedCredential> allCredentials = issuedCredentialRepository.findAll();
-        return SuperResult.ok(allCredentials);
+        List<Credential> credentials = credentialRepository.findCredentialsByType(0);
+        return SuperResult.ok(credentials);
     }
 }

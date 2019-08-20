@@ -11,15 +11,25 @@ public class Relation {
     private int id;
     private String name;
     private String weid;
+    private String privateKey;
     private int type; // 0 - 用户 1 - 政府 2 - 机构
 
     public Relation() {
     }
 
-    public Relation(String name, String weid, int type) {
+    public Relation(String name, String weid, String privateKey, int type) {
         this.name = name;
         this.weid = weid;
+        this.privateKey = privateKey;
         this.type = type;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
+    }
+
+    public void setPrivateKey(String privateKey) {
+        this.privateKey = privateKey;
     }
 
     public int getId() {

@@ -3,13 +3,11 @@ package org.bithacks.defidefender.controller;
 import org.bithacks.defidefender.service.CommonService;
 import org.bithacks.defidefender.utils.SuperResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/common")
+@CrossOrigin
 public class CommonController {
 
     @Autowired
@@ -56,5 +54,11 @@ public class CommonController {
         commonService.initializeNetwork();
         String address = commonService.deployCertification();
         return SuperResult.ok(address);
+    }
+
+    @RequestMapping(value = "/getCredentialsByWeid", method = RequestMethod.POST)
+    public SuperResult getCredentialsByWeid(@RequestBody String jsonStr) {
+        System.out.println("Get CredentialsByWeid Request");
+        return commonService.getCredentialsByWeid(jsonStr);
     }
 }

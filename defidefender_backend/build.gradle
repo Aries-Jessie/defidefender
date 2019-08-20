@@ -58,7 +58,7 @@ dependencies {
     compile 'com.alibaba:fastjson:1.2.58'
     runtime 'com.alibaba:fastjson:1.2.58'
 
-    compile('org.springframework.boot:spring-boot-starter-web'){
+    compile('org.springframework.boot:spring-boot-starter-web') {
         exclude module: "logback-classic"
     }
     testCompile 'org.springframework.boot:spring-boot-starter-test'
@@ -66,6 +66,7 @@ dependencies {
         exclude module: "logback-classic"
     }
 
+    compile("mysql:mysql-connector-java:5.1.45")
     runtime("mysql:mysql-connector-java:5.1.45")
 
     // web3j
@@ -93,10 +94,10 @@ sourceSets {
 jar {
     destinationDir file('dist/apps')
     archiveName project.name + '.jar'
-    exclude '**/*.xml'
-    exclude '**/*.properties'
-    exclude '**/*.crt'
-    exclude '**/*.key'
+//    exclude '**/*.xml'
+//    exclude '**/*.properties'
+//    exclude '**/*.crt'
+//    exclude '**/*.key'
 
     doLast {
         copy {

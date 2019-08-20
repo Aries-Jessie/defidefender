@@ -1,55 +1,13 @@
-2019-08-19 11:40:08.613 [main] ERROR StandardService() - Failed to start connector [Connector[HTTP/1.1-8080]]
-org.apache.catalina.LifecycleException: Failed to start component [Connector[HTTP/1.1-8080]]
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:167) ~[tomcat-embed-core-8.5.40.jar:8.5.40]
-	at org.apache.catalina.core.StandardService.addConnector(StandardService.java:225) [tomcat-embed-core-8.5.40.jar:8.5.40]
-	at org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer.addPreviouslyRemovedConnectors(TomcatEmbeddedServletContainer.java:265) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainer.start(TomcatEmbeddedServletContainer.java:208) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.boot.context.embedded.EmbeddedWebApplicationContext.startEmbeddedServletContainer(EmbeddedWebApplicationContext.java:308) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.boot.context.embedded.EmbeddedWebApplicationContext.finishRefresh(EmbeddedWebApplicationContext.java:147) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:545) [spring-context-4.3.24.RELEASE.jar:4.3.24.RELEASE]
-	at org.springframework.boot.context.embedded.EmbeddedWebApplicationContext.refresh(EmbeddedWebApplicationContext.java:124) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:693) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:360) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:303) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1118) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1107) [spring-boot-1.5.21.RELEASE.jar:1.5.21.RELEASE]
-	at org.bithacks.defidefender.DeFiDefenderApplication.main(DeFiDefenderApplication.java:10) [classes/:?]
-Caused by: org.apache.catalina.LifecycleException: Protocol handler start failed
-	at org.apache.catalina.connector.Connector.startInternal(Connector.java:1020) ~[tomcat-embed-core-8.5.40.jar:8.5.40]
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150) ~[tomcat-embed-core-8.5.40.jar:8.5.40]
-	... 13 more
-Caused by: java.net.BindException: Address already in use: bind
-	at sun.nio.ch.Net.bind0(Native Method) ~[?:1.8.0_151]
-	at sun.nio.ch.Net.bind(Net.java:433) ~[?:1.8.0_151]
-	at sun.nio.ch.Net.bind(Net.java:425) ~[?:1.8.0_151]
-	at sun.nio.ch.ServerSocketChannelImpl.bind(ServerSocketChannelImpl.java:223) ~[?:1.8.0_151]
-	at sun.nio.ch.ServerSocketAdaptor.bind(ServerSocketAdaptor.java:74) ~[?:1.8.0_151]
-	at org.apache.tomcat.util.net.NioEndpoint.bind(NioEndpoint.java:219) ~[tomcat-embed-core-8.5.40.jar:8.5.40]
-	at org.apache.tomcat.util.net.AbstractEndpoint.start(AbstractEndpoint.java:1178) ~[tomcat-embed-core-8.5.40.jar:8.5.40]
-	at org.apache.coyote.AbstractProtocol.start(AbstractProtocol.java:591) ~[tomcat-embed-core-8.5.40.jar:8.5.40]
-	at org.apache.catalina.connector.Connector.startInternal(Connector.java:1018) ~[tomcat-embed-core-8.5.40.jar:8.5.40]
-	at org.apache.catalina.util.LifecycleBase.start(LifecycleBase.java:150) ~[tomcat-embed-core-8.5.40.jar:8.5.40]
-	... 13 more
-2019-08-19 11:40:08.630 [main] ERROR LoggingFailureAnalysisReporter() - 
-
-***************************
-APPLICATION FAILED TO START
-***************************
-
-Description:
-
-The Tomcat connector configured to listen on port 8080 failed to start. The port may already be in use or the connector may be misconfigured.
-
-Action:
-
-Verify the connector's configuration, identify and stop any process that's listening on port 8080, or configure this application to listen on another port.
-
-2019-08-19 11:51:12.937 [http-nio-8080-exec-5] ERROR PresentationPolicyE() - create PresentationPolicyE has error, please check the log.
-java.lang.ClassCastException: java.lang.Integer cannot be cast to java.util.HashMap
-	at com.webank.weid.protocol.base.PresentationPolicyE.fromJson(PresentationPolicyE.java:127) [weid-java-sdk-1.3.1.jar:?]
-	at org.bithacks.defidefender.service.impl.DIDServiceImpl.createPresentation(DIDServiceImpl.java:239) [classes/:?]
-	at org.bithacks.defidefender.service.impl.UserServiceImpl.createPresentation(UserServiceImpl.java:57) [classes/:?]
-	at org.bithacks.defidefender.controller.UserController.createPresentation(UserController.java:37) [classes/:?]
+2019-08-20 15:24:46.825 [http-nio-8080-exec-9] ERROR FileUtil() - getDataByPath error
+java.io.FileNotFoundException: keys\0xf3d3b86dfe9e551af2fc908a47663e921705f855 (系统找不到指定的文件。)
+	at java.io.FileInputStream.open0(Native Method) ~[?:1.8.0_151]
+	at java.io.FileInputStream.open(FileInputStream.java:195) ~[?:1.8.0_151]
+	at java.io.FileInputStream.<init>(FileInputStream.java:138) ~[?:1.8.0_151]
+	at java.io.FileInputStream.<init>(FileInputStream.java:93) ~[?:1.8.0_151]
+	at org.bithacks.defidefender.utils.FileUtil.getDataByPath(FileUtil.java:81) [classes/:?]
+	at org.bithacks.defidefender.utils.PrivateKeyUtil.getPrivateKeyByWeId(PrivateKeyUtil.java:100) [classes/:?]
+	at org.bithacks.defidefender.service.impl.CommonServiceImpl.createCPT(CommonServiceImpl.java:70) [classes/:?]
+	at org.bithacks.defidefender.controller.CommonController.createCPT(CommonController.java:19) [classes/:?]
 	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_151]
 	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_151]
 	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_151]
@@ -104,22 +62,100 @@ java.lang.ClassCastException: java.lang.Integer cannot be cast to java.util.Hash
 	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624) [?:1.8.0_151]
 	at org.apache.tomcat.util.threads.TaskThread$WrappingRunnable.run(TaskThread.java:61) [tomcat-embed-core-8.5.40.jar:8.5.40]
 	at java.lang.Thread.run(Thread.java:748) [?:1.8.0_151]
-2019-08-19 11:51:12.949 [http-nio-8080-exec-5] ERROR CredentialPojoServiceImpl() - check input error:100602-the presentation policy is invalid.
-2019-08-19 12:47:07.540 [nioEventLoopGroup-2-1] ERROR ChannelHandler() - event:READER_IDLE connect127.0.0.1:20200 long time Inactive，disconnect
-2019-08-19 12:56:35.902 [http-nio-8080-exec-1] ERROR CredentialPojoServiceImpl() - [verify] presentation verify failed, error message : input parameter is illegal.
-2019-08-19 12:56:35.905 [http-nio-8080-exec-1] ERROR CredentialPojoServiceImpl() - [verify] checkInputArgs fail.
-2019-08-19 12:57:30.693 [http-nio-8080-exec-4] ERROR CredentialPojoServiceImpl() - [verify] The nonce of challenge is not matched with the presentationE's.
-2019-08-19 12:57:30.693 [http-nio-8080-exec-4] ERROR CredentialPojoServiceImpl() - [verify] checkInputArgs fail.
-2019-08-19 13:00:57.159 [http-nio-8080-exec-2] ERROR CredentialPojoServiceImpl() - [verify] The nonce of challenge is not matched with the presentationE's.
-2019-08-19 13:00:57.162 [http-nio-8080-exec-2] ERROR CredentialPojoServiceImpl() - [verify] checkInputArgs fail.
-2019-08-19 13:06:50.304 [http-nio-8080-exec-3] ERROR CredentialPojoServiceImpl() - [verify] The input issuer weid is not match the presentian's.
-2019-08-19 13:06:50.308 [http-nio-8080-exec-3] ERROR CredentialPojoServiceImpl() - [verify] checkInputArgs fail.
-2019-08-19 13:11:34.108 [http-nio-8080-exec-2] ERROR CredentialPojoServiceImpl() - [verify] The input issuer weid is not match the credential's.
-2019-08-19 13:11:54.845 [http-nio-8080-exec-4] ERROR CredentialPojoServiceImpl() - [verify] The input issuer weid is not match the credential's.
-2019-08-19 13:12:54.480 [http-nio-8080-exec-6] ERROR CredentialPojoServiceImpl() - [verify] presentation verify failed, error message : input parameter is illegal.
-2019-08-19 13:12:54.480 [http-nio-8080-exec-6] ERROR CredentialPojoServiceImpl() - [verify] checkInputArgs fail.
-2019-08-19 13:16:19.004 [http-nio-8080-exec-9] ERROR CredentialPojoServiceImpl() - [verify] The input issuer weid is not match the credential's.
-2019-08-19 16:31:41.797 [http-nio-8080-exec-1] ERROR CptServiceEngineV2() - Query cpt id : 20000 does not exist.
-2019-08-19 16:31:49.718 [http-nio-8080-exec-2] ERROR CptServiceEngineV2() - Query cpt id : 200000 does not exist.
-2019-08-19 16:31:52.827 [http-nio-8080-exec-8] ERROR CptServiceEngineV2() - Query cpt id : 2000 does not exist.
-2019-08-19 19:53:26.352 [nioEventLoopGroup-2-1] ERROR ChannelHandler() - event:READER_IDLE connect127.0.0.1:20200 long time Inactive，disconnect
+2019-08-20 15:24:47.126 [http-nio-8080-exec-9] ERROR CptServiceImpl() - Input cpt publisher private key : WeIdPrivateKey(privateKey=null) is in valid.
+2019-08-20 17:43:44.619 [main] ERROR LoggingFailureAnalysisReporter() - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field issuedCredentialRepository in org.bithacks.defidefender.service.impl.DIDServiceImpl required a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' in your configuration.
+
+2019-08-20 17:48:27.222 [main] ERROR LoggingFailureAnalysisReporter() - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field issuedCredentialRepository in org.bithacks.defidefender.service.impl.DIDServiceImpl required a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' in your configuration.
+
+2019-08-20 19:34:18.412 [main] ERROR LoggingFailureAnalysisReporter() - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field issuedCredentialRepository in org.bithacks.defidefender.service.impl.DIDServiceImpl required a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' in your configuration.
+
+2019-08-20 19:34:30.556 [main] ERROR LoggingFailureAnalysisReporter() - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field issuedCredentialRepository in org.bithacks.defidefender.service.impl.DIDServiceImpl required a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' in your configuration.
+
+2019-08-20 19:34:55.240 [main] ERROR LoggingFailureAnalysisReporter() - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field issuedCredentialRepository in org.bithacks.defidefender.service.impl.DIDServiceImpl required a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' in your configuration.
+
+2019-08-20 19:35:27.930 [main] ERROR LoggingFailureAnalysisReporter() - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Field issuedCredentialRepository in org.bithacks.defidefender.service.impl.DIDServiceImpl required a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'org.bithacks.defidefender.dao.IssuedCredentialRepository' in your configuration.
+
+2019-08-20 19:38:29.312 [http-nio-8080-exec-5] ERROR SqlExceptionHelper() - Data truncation: Data too long for column 'credential' at row 1
+2019-08-20 19:38:54.578 [http-nio-8080-exec-1] ERROR SqlExceptionHelper() - Data truncation: Data too long for column 'credential' at row 1
+2019-08-20 19:39:38.605 [http-nio-8080-exec-5] ERROR SqlExceptionHelper() - Data truncation: Data too long for column 'credential' at row 1
+2019-08-20 19:40:14.133 [http-nio-8080-exec-6] ERROR SqlExceptionHelper() - Data truncation: Data too long for column 'credential' at row 1
+2019-08-20 19:44:38.260 [http-nio-8080-exec-1] ERROR SqlExceptionHelper() - Table 'defidefender.credential' doesn't exist
+2019-08-20 19:45:30.386 [http-nio-8080-exec-8] ERROR SqlExceptionHelper() - Table 'defidefender.relation' doesn't exist

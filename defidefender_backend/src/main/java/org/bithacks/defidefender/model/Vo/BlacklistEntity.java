@@ -1,7 +1,5 @@
 package org.bithacks.defidefender.model.Vo;
 
-import org.springframework.stereotype.Component;
-
 import java.io.Serializable;
 
 public class BlacklistEntity implements Serializable {

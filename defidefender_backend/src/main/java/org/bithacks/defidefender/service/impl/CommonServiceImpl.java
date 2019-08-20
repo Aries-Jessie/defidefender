@@ -9,8 +9,12 @@ import com.webank.weid.protocol.response.ResponseData;
 import org.bithacks.defidefender.contract.Certification;
 import org.bithacks.defidefender.dao.CPTRepository;
 import org.bithacks.defidefender.dao.ContractRepository;
+import org.bithacks.defidefender.dao.CredentialRepository;
+import org.bithacks.defidefender.dao.RelationRepository;
 import org.bithacks.defidefender.model.Po.CPT;
 import org.bithacks.defidefender.model.Po.Contract;
+import org.bithacks.defidefender.model.Po.Credential;
+import org.bithacks.defidefender.model.Po.Relation;
 import org.bithacks.defidefender.service.CommonService;
 import org.bithacks.defidefender.service.DIDService;
 import org.bithacks.defidefender.utils.CommonUtils;
@@ -28,7 +32,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class CommonServiceImpl implements CommonService {
@@ -62,12 +68,19 @@ public class CommonServiceImpl implements CommonService {
     @Autowired
     private CPTRepository cptRepository;
 
+    @Autowired
+    private RelationRepository relationRepository;
+
+    @Autowired
+    private CredentialRepository credentialRepository;
+
     @Override
     public SuperResult createCPT(String jsonStr) {
         try {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             String publisher = jsonObject.getString(ConstantFields.USER_CPT_PUBLISHER);
-            String privateKey = PrivateKeyUtil.getPrivateKeyByWeId(ConstantFields.KEY_DIR, publisher);
+            String privateKey = relationRepository.findRelationsByWeid(publisher).get(0).getPrivateKey();
+//            String privateKey = PrivateKeyUtil.getPrivateKeyByWeId(ConstantFields.KEY_DIR, publisher);
             JSONObject cptSchemaNode = (JSONObject) jsonObject.get(ConstantFields.USER_CPT_CPTSCHEMA);
             HashMap<String, Object> cptSchema = CommonUtils.convertJsonToMap(cptSchemaNode.toJSONString());
             ResponseData<CptBaseInfo> response = weIdService.registCpt(publisher, privateKey, cptSchema);
@@ -95,9 +108,11 @@ public class CommonServiceImpl implements CommonService {
     public SuperResult getCredential(String jsonStr) {
         try {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
-            String weid = jsonObject.getString("weid");
-            int type = jsonObject.getInteger("type");
-            CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, type);
+            int id = jsonObject.getIntValue("id");
+            // 读取Credential
+            Credential credential = credentialRepository.findOne(id);
+            CredentialPojo credentialPojo = CommonUtils.getCredentialFromDB(credential);
+//            CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, type);
             return SuperResult.ok(credentialPojo);
         } catch (Exception e) {
             return SuperResult.fail();
@@ -157,7 +172,9 @@ public class CommonServiceImpl implements CommonService {
 
     @Override
     public Certification getCertification() {
-        String address = "0xa87c85e4b5ac3860c619e82d909b17447d63916a";
+        String address = contractRepository.findOne(ConstantFields.CONTRACT_CERTIFICATION).getAddress();
+        System.out.println(address);
+//        String address = "0xa87c85e4b5ac3860c619e82d909b17447d63916a";
         initializeNetwork();
         return Certification.load(address, getWeb3j(), getCredentials(), new StaticGasProvider(gasPrice, gasLimit));
     }
@@ -169,6 +186,23 @@ public class CommonServiceImpl implements CommonService {
             int cptId = jsonObject.getInteger("cptId");
             ResponseData<Cpt> response = weIdService.getCptById(cptId);
             return SuperResult.ok(response);
+        } catch (Exception e) {
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult getCredentialsByWeid(String jsonStr) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            String weid = jsonObject.getString("weid");
+            // 读取Credential
+            List<Credential> credentials = credentialRepository.findCredentialsByWeid(weid);
+            List<CredentialPojo> result = new ArrayList<>();
+            for (Credential entity : credentials) {
+                result.add(CommonUtils.getCredentialFromDB(entity));
+            }
+            return SuperResult.ok(credentials);
         } catch (Exception e) {
             return SuperResult.fail();
         }

@@ -19,6 +19,7 @@ import org.bithacks.defidefender.utils.PrivateKeyUtil;
 import org.bithacks.defidefender.utils.SuperResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -45,15 +46,16 @@ public class UserServiceImpl implements UserService {
             int type = jsonObject.getInteger("type"); // 0-用户 1-政府 2-机构
             ResponseData<CreateWeIdDataResult> response = weIdService.createWeid();
             if (response.getErrorCode().intValue() == ErrorCode.SUCCESS.getCode()) {
-                relationRepository.save(new Relation(name, response.getResult().getWeId(), type));
-                PrivateKeyUtil.savePrivateKey(
-                        ConstantFields.KEY_DIR,
-                        response.getResult().getWeId(),
-                        response.getResult().getUserWeIdPrivateKey().getPrivateKey()
-                );
+                String privateKey = response.getResult().getUserWeIdPrivateKey().getPrivateKey();
+                relationRepository.save(new Relation(name, response.getResult().getWeId(), privateKey, type));
+//                PrivateKeyUtil.savePrivateKey(
+//                        ConstantFields.KEY_DIR,
+//                        response.getResult().getWeId(),
+//                        response.getResult().getUserWeIdPrivateKey().getPrivateKey()
+//                );
             }
-            response.getResult().setUserWeIdPrivateKey(null);
-            return SuperResult.ok(response);
+//            response.getResult().setUserWeIdPrivateKey(null);
+            return SuperResult.ok(response.getResult());
         } catch (Exception e) {
             return SuperResult.fail();
         }

@@ -3,13 +3,11 @@ package org.bithacks.defidefender.controller;
 import org.bithacks.defidefender.service.UserService;
 import org.bithacks.defidefender.utils.SuperResult;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/user")
+@CrossOrigin
 public class UserController {
 
     @Autowired

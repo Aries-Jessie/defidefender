@@ -7,6 +7,7 @@ import org.bithacks.defidefender.dao.LoanRecordRepository;
 import org.bithacks.defidefender.dao.RelationRepository;
 import org.bithacks.defidefender.model.Po.LoanRecord;
 import org.bithacks.defidefender.model.Vo.BlacklistEntity;
+import org.bithacks.defidefender.service.CommonService;
 import org.bithacks.defidefender.service.CompanyService;
 import org.bithacks.defidefender.service.DIDService;
 import org.bithacks.defidefender.utils.CommonUtils;
@@ -17,6 +18,7 @@ import org.fisco.bcos.web3j.tuples.generated.Tuple5;
 import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -35,7 +37,8 @@ public class CompanyServiceImpl implements CompanyService {
     @Autowired
     private RelationRepository relationRepository;
 
-    private CommonServiceImpl commonService = new CommonServiceImpl();
+    @Autowired
+    private CommonService commonService;
 
     @Override
     public SuperResult verifyPresentation(String jsonStr) {
@@ -191,10 +194,10 @@ public class CompanyServiceImpl implements CompanyService {
                     return SuperResult.fail();
                 }
             }
+            return SuperResult.ok();
         } catch (Exception e) {
             return SuperResult.fail();
         }
-        return null;
     }
 
     @Override

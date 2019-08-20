@@ -8,9 +8,18 @@ import com.webank.weid.protocol.request.SetAuthenticationArgs;
 import com.webank.weid.protocol.request.SetPublicKeyArgs;
 import com.webank.weid.protocol.response.CreateWeIdDataResult;
 import com.webank.weid.protocol.response.ResponseData;
-import com.webank.weid.rpc.*;
-import com.webank.weid.service.impl.*;
+import com.webank.weid.rpc.AuthorityIssuerService;
+import com.webank.weid.rpc.CptService;
+import com.webank.weid.rpc.CredentialPojoService;
+import com.webank.weid.rpc.WeIdService;
+import com.webank.weid.service.impl.AuthorityIssuerServiceImpl;
+import com.webank.weid.service.impl.CptServiceImpl;
+import com.webank.weid.service.impl.CredentialPojoServiceImpl;
+import com.webank.weid.service.impl.WeIdServiceImpl;
+import org.bithacks.defidefender.dao.CredentialRepository;
 import org.bithacks.defidefender.dao.IssuedCredentialRepository;
+import org.bithacks.defidefender.dao.RelationRepository;
+import org.bithacks.defidefender.model.Po.Credential;
 import org.bithacks.defidefender.model.Po.IssuedCredential;
 import org.bithacks.defidefender.service.DIDService;
 import org.bithacks.defidefender.utils.CommonUtils;
@@ -30,11 +39,7 @@ public class DIDServiceImpl implements DIDService {
 
     private static final Logger logger = LoggerFactory.getLogger(DIDServiceImpl.class);
 
-    private AuthorityIssuerService authorityIssuerService = new AuthorityIssuerServiceImpl();
-
     private CptService cptService = new CptServiceImpl();
-
-    private CredentialService credentialService = new CredentialServiceImpl();
 
     private WeIdService weIdService = new WeIdServiceImpl();
 
@@ -42,6 +47,12 @@ public class DIDServiceImpl implements DIDService {
 
     @Autowired
     private IssuedCredentialRepository issuedCredentialRepository;
+
+    @Autowired
+    private RelationRepository relationRepository;
+
+    @Autowired
+    private CredentialRepository credentialRepository;
 
     /**
      * set validity period to 360 days by default.
@@ -136,9 +147,9 @@ public class DIDServiceImpl implements DIDService {
     public ResponseData<Boolean> registerIssuerType(String issuer, String authorityName) {
         WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
         weIdAuthentication.setWeId(issuer);
-
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
-        String privateKey = PrivateKeyUtil.getPrivateKeyByWeId("keys/", issuer);
+        String privateKey = relationRepository.findRelationsByWeid(issuer).get(0).getPrivateKey();
+//        String privateKey = PrivateKeyUtil.getPrivateKeyByWeId("keys/", issuer);
         System.out.println(privateKey);
         weIdPrivateKey.setPrivateKey(privateKey);
         weIdAuthentication.setWeIdPrivateKey(weIdPrivateKey);
@@ -210,14 +221,22 @@ public class DIDServiceImpl implements DIDService {
         // 生成凭证
         ResponseData<CredentialPojo> response = credentialPojoService.createCredential(createCredentialPojoArgs);
         // 保存凭证
-        CommonUtils.writeObjectToFile(response.getResult(), claimData.get("weid").toString(), 0);
+        String weid = claimData.get("weid").toString();
+        String credential = response.getResult().toJson();
+        System.out.println("before save");
+        credentialRepository.save(new Credential(weid, credential, 0));
+        System.out.println("after save");
+//        CommonUtils.writeObjectToFile(response.getResult(), claimData.get("weid").toString(), 0);
         issuedCredentialRepository.save(new IssuedCredential(claimData.get("weid").toString()));
         return response;
     }
 
     @Override
     public ResponseData<CredentialPojo> createSelectiveCredential(String weid, String claimPolicyJson) {
-        CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, 0);
+        // 读取凭证
+        Credential credential = credentialRepository.findCredentialsByWeidAndType(weid, 0).get(0);
+        CredentialPojo credentialPojo = CommonUtils.getCredentialFromDB(credential);
+//        CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, 0);
         CredentialPojoService credentialPojoService = new CredentialPojoServiceImpl();
 
         // 选择性披露
@@ -225,19 +244,26 @@ public class DIDServiceImpl implements DIDService {
         claimPolicy.setFieldsToBeDisclosed(claimPolicyJson);
         ResponseData<CredentialPojo> selectiveResponse =
                 credentialPojoService.createSelectiveCredential(credentialPojo, claimPolicy);
-        CommonUtils.writeObjectToFile(selectiveResponse.getResult(), weid, 1);
+        // 保存凭证
+        String credentialJson = selectiveResponse.getResult().toJson();
+        credentialRepository.save(new Credential(weid, credentialJson, 1));
+//        CommonUtils.writeObjectToFile(selectiveResponse.getResult(), weid, 1);
         return selectiveResponse;
     }
 
     @Override
     public ResponseData<PresentationE> createPresentation(String ownerWeid, String policyJson) {
-        CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(ownerWeid, 0);
+        // 读取凭证
+        Credential credential = credentialRepository.findCredentialsByWeidAndType(ownerWeid, 0).get(0);
+        CredentialPojo credentialPojo = CommonUtils.getCredentialFromDB(credential);
+//        CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(ownerWeid, 0);
         List<CredentialPojo> credentialList = new ArrayList<CredentialPojo>();
         credentialList.add(credentialPojo);
         WeIdAuthentication weIdAuthentication = new WeIdAuthentication();
         weIdAuthentication.setWeId(ownerWeid);
         WeIdPrivateKey weIdPrivateKey = new WeIdPrivateKey();
-        weIdPrivateKey.setPrivateKey(PrivateKeyUtil.getPrivateKeyByWeId(ConstantFields.KEY_DIR, ownerWeid));
+        String privateKey = relationRepository.findRelationsByWeid(ownerWeid).get(0).getPrivateKey();
+        weIdPrivateKey.setPrivateKey(privateKey);
         weIdAuthentication.setWeIdPrivateKey(weIdPrivateKey);
         weIdAuthentication.setWeIdPublicKeyId(ownerWeid + "#key0");
         // 创建challenge
@@ -265,7 +291,10 @@ public class DIDServiceImpl implements DIDService {
 
     @Override
     public ResponseData<Boolean> verifyCredential(String weid, String issuer, int type) {
-        CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, type);
+        // 获取凭证
+        Credential credential = credentialRepository.findCredentialsByWeidAndType(weid, type).get(0);
+        CredentialPojo credentialPojo = CommonUtils.getCredentialFromDB(credential);
+//        CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, type);
         ResponseData<Boolean> verifyResult = credentialPojoService.verify(issuer, credentialPojo);
         return verifyResult;
     }

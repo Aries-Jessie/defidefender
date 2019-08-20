@@ -6,13 +6,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.webank.weid.constant.JsonSchemaConstant;
 import com.webank.weid.protocol.base.CredentialPojo;
 import com.webank.weid.protocol.base.PresentationE;
+import org.bithacks.defidefender.model.Po.Credential;
 import org.bithacks.defidefender.model.Po.LoanRecord;
+import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
+@Component
 public class CommonUtils {
 
     public static HashMap<String, Object> buildCptJsonSchema() {
@@ -81,6 +84,12 @@ public class CommonUtils {
         }
     }
 
+    public static CredentialPojo getCredentialFromDB(Credential credential) {
+        String credentialJson = credential.getCredential();
+        CredentialPojo credentialPojo = CredentialPojo.fromJson(credentialJson);
+        return credentialPojo;
+    }
+
     public static CredentialPojo readObjectFromFile(String weid, int type) {
         String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "/";
         CredentialPojo temp = null;
@@ -146,7 +155,7 @@ public class CommonUtils {
 
     public static String generateDate() {
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(" yyyy-MM-dd");
+        SimpleDateFormat sdf = new SimpleDateFormat(" yyyy年MM月dd日");
         String format = sdf.format(date);
         return format;
     }

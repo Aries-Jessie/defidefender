@@ -19,4 +19,6 @@ public interface CommonService {
     Certification getCertification();
 
     SuperResult getCPTById(String jsonStr);
+
+    SuperResult getCredentialsByWeid(String jsonStr);
 }
