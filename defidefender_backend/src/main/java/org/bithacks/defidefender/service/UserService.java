@@ -19,5 +19,9 @@ public interface UserService {
 
     SuperResult listLoanRecords(String jsonStr);
 
-    SuperResult returnLoan(String jsonStr);
+    SuperResult repayLoan(String jsonStr);
+
+    SuperResult getCanLoanAmount(String jsonStr);
+
+    SuperResult getDailyRate(String jsonStr);
 }

@@ -48,4 +48,12 @@ public class ConstantFields {
     public static final int LOAN_STATUS_REJECT = 4;
     public static final int LOAN_STATUS_ADDBLACKLIST = 5;
 
+    public static final int LOAN_USER_ISSELF_WAITING = 0;
+    public static final int LOAN_USER_ISSELF_YES = 1;
+    public static final int LOAN_USER_ISSELF_NO = 2;
+
+    public static final int LOAN_USER_ISCREDENTIALVERIFIED_WAITING = 0;
+    public static final int LOAN_USER_ISCREDENTIALVERIFIED_YES = 1;
+    public static final int LOAN_USER_ISCREDENTIALVERIFIED_NO = 2;
+
 }

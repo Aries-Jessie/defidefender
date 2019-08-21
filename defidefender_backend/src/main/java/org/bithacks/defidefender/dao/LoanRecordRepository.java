@@ -15,4 +15,5 @@ public interface LoanRecordRepository extends JpaRepository<LoanRecord, Integer>
     List<LoanRecord> findLoanRecordsByWeidAndStatusGreaterThanEqual(String weid, int status);
 
     List<LoanRecord> findLoanRecordsByCompanyNameAndStatusGreaterThanEqual(String companyName, int status);
+
 }

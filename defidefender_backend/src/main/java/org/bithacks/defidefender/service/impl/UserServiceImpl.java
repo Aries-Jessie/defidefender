@@ -14,6 +14,7 @@ import org.bithacks.defidefender.model.Po.Relation;
 import org.bithacks.defidefender.model.Po.User;
 import org.bithacks.defidefender.service.DIDService;
 import org.bithacks.defidefender.service.UserService;
+import org.bithacks.defidefender.utils.CommonUtils;
 import org.bithacks.defidefender.utils.ConstantFields;
 import org.bithacks.defidefender.utils.PrivateKeyUtil;
 import org.bithacks.defidefender.utils.SuperResult;
@@ -126,9 +127,12 @@ public class UserServiceImpl implements UserService {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             String companyName = jsonObject.getString("companyName");
             double amount = jsonObject.getDoubleValue("amount");
-            String expiredDate = jsonObject.getString("expiredDate");
-            String credentialOwner = jsonObject.getString("credentialOwner");
-            LoanRecord record = loanRecordRepository.save(new LoanRecord(credentialOwner, companyName, amount, expiredDate, credentialOwner, ConstantFields.LOAN_STATUS_WAITING));
+            double dailyRate = jsonObject.getDoubleValue("dailyRate");
+            int durationMonth = jsonObject.getIntValue("durationMonth");
+            String weid = jsonObject.getString("weid");
+            String createdTime = CommonUtils.generateDateStr();
+            String endTime = CommonUtils.getEndTime(createdTime, durationMonth);
+            LoanRecord record = loanRecordRepository.save(new LoanRecord(weid, companyName, amount, durationMonth, weid, ConstantFields.LOAN_USER_ISSELF_WAITING, ConstantFields.LOAN_USER_ISCREDENTIALVERIFIED_WAITING, dailyRate, createdTime, endTime, ConstantFields.LOAN_STATUS_WAITING));
             return SuperResult.ok(record);
         } catch (Exception e) {
             return SuperResult.fail();
@@ -160,14 +164,40 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SuperResult returnLoan(String jsonStr) {
+    public SuperResult repayLoan(String jsonStr) {
         try {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             int id = jsonObject.getIntValue("id");
             LoanRecord record = loanRecordRepository.findOne(id);
+            String repayTime = CommonUtils.generateDateStr();
+            record.setRepayTime(repayTime);
             record.setStatus(ConstantFields.LOAN_STATUS_CONFIRM_RETURN);
             loanRecordRepository.save(record);
             return SuperResult.ok(record);
+        } catch (Exception e) {
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult getCanLoanAmount(String jsonStr) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            String weid = jsonObject.getString("weid");
+            // TODO 获取能够借款的总额
+            return SuperResult.ok();
+        } catch (Exception e) {
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult getDailyRate(String jsonStr) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            String weid = jsonObject.getString("weid");
+            // TODO 获取用户日利率
+            return SuperResult.ok(weid);
         } catch (Exception e) {
             return SuperResult.fail();
         }

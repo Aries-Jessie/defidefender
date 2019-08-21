@@ -72,7 +72,7 @@ public class UserController {
     @RequestMapping(value = "/returnLoan", method = RequestMethod.POST)
     public SuperResult returnLoan(@RequestBody String jsonStr) {
         System.out.println("Return Loan Request");
-        SuperResult result = userService.returnLoan(jsonStr);
+        SuperResult result = userService.repayLoan(jsonStr);
         return result;
     }
 

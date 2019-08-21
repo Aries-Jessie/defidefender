@@ -124,7 +124,8 @@ public class CommonServiceImpl implements CommonService {
         try {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             String weid = jsonObject.getString("weid");
-            PresentationE presentationE = CommonUtils.readPresentationFromFile(weid);
+            String presentationJson = credentialRepository.findCredentialsByWeidAndType(weid, 2).get(0).getCredential();
+            PresentationE presentationE = PresentationE.fromJson(presentationJson);
             return SuperResult.ok(presentationE);
         } catch (Exception e) {
             return SuperResult.fail();

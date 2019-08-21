@@ -23,4 +23,8 @@ public interface CompanyService {
     SuperResult addToBlacklist(String jsonStr);
 
     SuperResult listLoanRecords(String jsonStr);
+
+    SuperResult verifyUserAuthenticity(String jsonStr);
+
+    SuperResult verifyMultiParityLoan(String jsonStr);
 }

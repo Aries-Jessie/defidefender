@@ -23,8 +23,6 @@ import org.bithacks.defidefender.model.Po.Credential;
 import org.bithacks.defidefender.model.Po.IssuedCredential;
 import org.bithacks.defidefender.service.DIDService;
 import org.bithacks.defidefender.utils.CommonUtils;
-import org.bithacks.defidefender.utils.ConstantFields;
-import org.bithacks.defidefender.utils.PrivateKeyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -271,15 +269,19 @@ public class DIDServiceImpl implements DIDService {
         challenge.setNonce("Verify Authenticity");
         // 创建presentationPolicyE
         PresentationPolicyE presentationPolicyE = PresentationPolicyE.fromJson(policyJson);
-        //创建Presentation
+        // 创建Presentation
         ResponseData<PresentationE> presentationE = credentialPojoService.createPresentation(credentialList, presentationPolicyE, challenge, weIdAuthentication);
-        CommonUtils.writePresentationToFile(presentationE.getResult(), ownerWeid);
+        // 保存Presentation
+        credentialRepository.save(new Credential(ownerWeid, presentationE.getResult().toJson(), 2));
         return presentationE;
     }
 
     @Override
     public ResponseData<Boolean> verifyPresentation(String weid, String policyJson) {
-        PresentationE presentation = CommonUtils.readPresentationFromFile(weid);
+        // 读取Presentation
+        String presentationJson = credentialRepository.findCredentialsByWeidAndType(weid, 2).get(0).getCredential();
+        PresentationE presentation = PresentationE.fromJson(presentationJson);
+//         CommonUtils.readPresentationFromFile(weid);
         // 创建challenge
         Challenge challenge = Challenge.create(weid, "Company Presentation");
         challenge.setNonce("Verify Authenticity");

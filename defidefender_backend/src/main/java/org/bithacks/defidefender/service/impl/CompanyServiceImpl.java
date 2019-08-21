@@ -15,13 +15,12 @@ import org.bithacks.defidefender.utils.ConstantFields;
 import org.bithacks.defidefender.utils.SuperResult;
 import org.fisco.bcos.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.fisco.bcos.web3j.tuples.generated.Tuple5;
-import org.fisco.bcos.web3j.tx.gas.StaticGasProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -57,9 +56,15 @@ public class CompanyServiceImpl implements CompanyService {
     public SuperResult verifyCredential(String jsonStr) {
         try {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            int id = jsonObject.getIntValue("id");
             String weid = jsonObject.getString("weid");
             String issuer = jsonObject.getString("issuer");
             int type = jsonObject.getInteger("type");
+            int verifyType = jsonObject.getIntValue("verifyType");
+            LoanRecord record = loanRecordRepository.findOne(id);
+            int isVerified = verifyType == 0 ? ConstantFields.LOAN_USER_ISCREDENTIALVERIFIED_YES : ConstantFields.LOAN_USER_ISCREDENTIALVERIFIED_NO;
+            record.setIsCredentialVerified(isVerified);
+            loanRecordRepository.save(record);
             ResponseData<Boolean> response = weIdService.verifyCredential(weid, issuer, type);
             return SuperResult.ok(response);
         } catch (Exception e) {
@@ -75,7 +80,7 @@ public class CompanyServiceImpl implements CompanyService {
             String record = jsonObject.getString("record");
             String publisher = jsonObject.getString("publisher");
             Certification certification = commonService.getCertification();
-            TransactionReceipt receipt = certification.addBlacklistEntity(UUID.randomUUID().toString(), weid, record, publisher, CommonUtils.generateDate()).send();
+            TransactionReceipt receipt = certification.addBlacklistEntity(UUID.randomUUID().toString(), weid, record, publisher, CommonUtils.generateDateStr()).send();
             List<Certification.AddBlacklistEntityEventEventResponse> response = certification.getAddBlacklistEntityEventEvents(receipt);
             if (!response.isEmpty()) {
                 return SuperResult.ok();
@@ -159,12 +164,12 @@ public class CompanyServiceImpl implements CompanyService {
     public SuperResult checkLoanStatus() {
         List<LoanRecord> newRecords = new ArrayList<>();
         List<LoanRecord> allRecords = loanRecordRepository.findAll();
-        String today = CommonUtils.generateDate();
+        String today = CommonUtils.generateDateStr();
         for (LoanRecord record : allRecords) {
-            if (record.getStatus() == ConstantFields.LOAN_STATUS_WAITING && today.compareTo(record.getExpiredDate()) > 0) {
+            if (record.getStatus() == ConstantFields.LOAN_STATUS_WAITING && today.compareTo(record.getEndTime()) > 0) {
                 record.setStatus(ConstantFields.LOAN_STATUS_REJECT);
                 newRecords.add(record);
-            } else if (record.getStatus() == ConstantFields.LOAN_STATUS_CONFIRM_NOTRETURN && today.compareTo(record.getExpiredDate()) > 0) {
+            } else if (record.getStatus() == ConstantFields.LOAN_STATUS_CONFIRM_NOTRETURN && today.compareTo(record.getEndTime()) > 0) {
                 record.setStatus(ConstantFields.LOAN_STATUS_CONFIRM_TIMEOUT);
                 newRecords.add(record);
             }
@@ -185,7 +190,7 @@ public class CompanyServiceImpl implements CompanyService {
                 String publisher = relationRepository.findRelationsByName(record.getCompanyName()).get(0).getWeid();
                 String recordStr = CommonUtils.generateBlacklistRecord(record);
                 Certification certification = commonService.getCertification();
-                TransactionReceipt receipt = certification.addBlacklistEntity(UUID.randomUUID().toString(), record.getWeid(), recordStr, publisher, CommonUtils.generateDate()).send();
+                TransactionReceipt receipt = certification.addBlacklistEntity(UUID.randomUUID().toString(), record.getWeid(), recordStr, publisher, CommonUtils.generateDateStr()).send();
                 List<Certification.AddBlacklistEntityEventEventResponse> response = certification.getAddBlacklistEntityEventEvents(receipt);
                 if (!response.isEmpty()) {
                     return SuperResult.ok();
@@ -207,6 +212,48 @@ public class CompanyServiceImpl implements CompanyService {
             String companyName = jsonObject.getString("companyName");
             List<LoanRecord> records = loanRecordRepository.findLoanRecordsByCompanyNameAndStatusGreaterThanEqual(companyName, 1);
             return SuperResult.ok(records);
+        } catch (Exception e) {
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult verifyUserAuthenticity(String jsonStr) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            int id = jsonObject.getIntValue("id");
+            LoanRecord record = loanRecordRepository.findOne(id);
+            record.setIsUserSelf(ConstantFields.LOAN_USER_ISSELF_YES);
+            loanRecordRepository.save(record);
+            return SuperResult.ok(true);
+        } catch (Exception e) {
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult verifyMultiParityLoan(String jsonStr) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            String weid = jsonObject.getString("weid");
+            // 获取已借平台
+            double count = loanRecordRepository.findLoanRecordsByWeidAndStatusGreaterThanEqual(weid, 1).size() * 1.0;
+            // 获取待还金额
+            List<LoanRecord> list1 = loanRecordRepository.findLoanRecordsByWeidAndStatus(weid, ConstantFields.LOAN_STATUS_CONFIRM_NOTRETURN);
+            List<LoanRecord> list2 = loanRecordRepository.findLoanRecordsByWeidAndStatus(weid, ConstantFields.LOAN_STATUS_CONFIRM_TIMEOUT);
+            List<LoanRecord> list3 = loanRecordRepository.findLoanRecordsByWeidAndStatus(weid, ConstantFields.LOAN_STATUS_ADDBLACKLIST);
+            List<LoanRecord> allNotPayRecords = new ArrayList<>();
+            allNotPayRecords.addAll(list1);
+            allNotPayRecords.addAll(list2);
+            allNotPayRecords.addAll(list3);
+            double notPayAmount = 0;
+            for (LoanRecord record : allNotPayRecords) {
+                notPayAmount += record.getAmount();
+            }
+            HashMap<String, Double> result = new HashMap<>();
+            result.put("multiParityCount", count);
+            result.put("notPayAmount", notPayAmount);
+            return SuperResult.ok(result);
         } catch (Exception e) {
             return SuperResult.fail();
         }

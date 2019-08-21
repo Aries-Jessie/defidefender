@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -110,58 +111,38 @@ public class CommonUtils {
         return temp;
     }
 
-    public static void writePresentationToFile(PresentationE obj, String weid) {
-        String path = ConstantFields.PRESENTATION_DIR + weid.substring(11) + "/";
-        FileUtil.checkDir(path);
-        File file = new File(path + "presentation.dat");
-        FileOutputStream out;
-        try {
-            out = new FileOutputStream(file);
-            ObjectOutputStream objOut = new ObjectOutputStream(out);
-            objOut.writeObject(obj);
-            objOut.flush();
-            objOut.close();
-            System.out.println("write presentation success!");
-        } catch (IOException e) {
-            System.out.println("write presentation failed");
-            e.printStackTrace();
-        }
-    }
-
-    public static PresentationE readPresentationFromFile(String weid) {
-        String path = ConstantFields.PRESENTATION_DIR + weid.substring(11) + "/";
-        PresentationE temp = null;
-        File file = new File(path + "presentation.dat");
-        FileInputStream in;
-        try {
-            in = new FileInputStream(file);
-            ObjectInputStream objIn = new ObjectInputStream(in);
-            temp = (PresentationE) objIn.readObject();
-            objIn.close();
-            System.out.println("read presentation success!");
-        } catch (IOException e) {
-            System.out.println("read presentation failed");
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return temp;
-    }
-
     public static HashMap<String, Object> convertJsonToMap(String jsonStr) {
         HashMap map = JSON.parseObject(jsonStr, HashMap.class);
         return map;
     }
 
-    public static String generateDate() {
+    public static String generateDateStr() {
+        // 获取当前时间
         Date date = new Date();
-        SimpleDateFormat sdf = new SimpleDateFormat(" yyyy年MM月dd日");
+        // 转换格式
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+        // 转换时间为相应格式
         String format = sdf.format(date);
         return format;
     }
 
+    public static String getEndTime(String createdTime, int month) {
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+            Date date = df.parse(createdTime);
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.MONTH, month);
+            Date endTimeDate = calendar.getTime();
+            String endTime = df.format(endTimeDate);
+            return endTime;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
     public static String generateBlacklistRecord(LoanRecord record) {
-        return "应该于" + record.getExpiredDate() + "还款" + record.getAmount() + "万元，但逾期未换";
+        return "应该于" + record.getEndTime() + "之前还款" + record.getAmount() + "万元，但逾期未换";
     }
 
 }
