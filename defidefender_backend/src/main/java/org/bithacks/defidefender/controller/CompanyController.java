@@ -77,4 +77,18 @@ public class CompanyController {
         SuperResult result = companyService.listLoanRecords(jsonStr);
         return result;
     }
+
+    @RequestMapping(value = "/verifyUserAuthenticity", method = RequestMethod.POST)
+    public SuperResult verifyUserAuthenticity(@RequestBody String jsonStr) {
+        System.out.println("verifyUserAuthenticity Request");
+        SuperResult result = companyService.verifyUserAuthenticity(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/verifyMultiParityLoan", method = RequestMethod.POST)
+    public SuperResult verifyMultiParityLoan(@RequestBody String jsonStr) {
+        System.out.println("verifyMultiParityLoan Request");
+        SuperResult result = companyService.verifyMultiParityLoan(jsonStr);
+        return result;
+    }
 }

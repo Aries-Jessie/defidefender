@@ -9,6 +9,8 @@ public interface CredentialRepository extends JpaRepository<Credential, Integer>
 
     List<Credential> findCredentialsByWeid(String weid);
 
+    List<Credential> findCredentialsByWeidAndTypeIn(String weid, List<Integer> types);
+
     List<Credential> findCredentialsByWeidAndType(String weid, int type);
 
     List<Credential> findCredentialsByType(int type);

@@ -76,4 +76,25 @@ public class UserController {
         return result;
     }
 
+    @RequestMapping(value = "/getCanLoanAmount", method = RequestMethod.POST)
+    public SuperResult getCanLoanAmount(@RequestBody String jsonStr) {
+        System.out.println("getCanLoanAmount Request");
+        SuperResult result = userService.getCanLoanAmount(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/getDailyRate", method = RequestMethod.POST)
+    public SuperResult getDailyRate(@RequestBody String jsonStr) {
+        System.out.println("getDailyRate Request");
+        SuperResult result = userService.getDailyRate(jsonStr);
+        return result;
+    }
+
+    @RequestMapping(value = "/getUserStatus", method = RequestMethod.POST)
+    public SuperResult getUserStatus(@RequestBody String jsonStr) {
+        System.out.println("getUserStatus Request");
+        SuperResult result = userService.getUserStatus(jsonStr);
+        return result;
+    }
+
 }

@@ -24,4 +24,6 @@ public interface UserService {
     SuperResult getCanLoanAmount(String jsonStr);
 
     SuperResult getDailyRate(String jsonStr);
+
+    SuperResult getUserStatus(String jsonStr);
 }

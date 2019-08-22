@@ -198,7 +198,10 @@ public class CommonServiceImpl implements CommonService {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             String weid = jsonObject.getString("weid");
             // 读取Credential
-            List<Credential> credentials = credentialRepository.findCredentialsByWeid(weid);
+            List<Integer> types = new ArrayList<>();
+            types.add(0);
+            types.add(1);
+            List<Credential> credentials = credentialRepository.findCredentialsByWeidAndTypeIn(weid, types);
             List<CredentialPojo> result = new ArrayList<>();
             for (Credential entity : credentials) {
                 result.add(CommonUtils.getCredentialFromDB(entity));

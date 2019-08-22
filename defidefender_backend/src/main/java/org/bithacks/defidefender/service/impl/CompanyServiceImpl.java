@@ -5,7 +5,9 @@ import com.webank.weid.protocol.response.ResponseData;
 import org.bithacks.defidefender.contract.Certification;
 import org.bithacks.defidefender.dao.LoanRecordRepository;
 import org.bithacks.defidefender.dao.RelationRepository;
+import org.bithacks.defidefender.dao.UserLoanRepository;
 import org.bithacks.defidefender.model.Po.LoanRecord;
+import org.bithacks.defidefender.model.Po.UserLoan;
 import org.bithacks.defidefender.model.Vo.BlacklistEntity;
 import org.bithacks.defidefender.service.CommonService;
 import org.bithacks.defidefender.service.CompanyService;
@@ -38,6 +40,9 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Autowired
     private CommonService commonService;
+
+    @Autowired
+    private UserLoanRepository userLoanRepository;
 
     @Override
     public SuperResult verifyPresentation(String jsonStr) {
@@ -151,9 +156,28 @@ public class CompanyServiceImpl implements CompanyService {
             int id = jsonObject.getIntValue("id");
             int handleType = jsonObject.getIntValue("handleType"); // 0 - 确认 1 - 拒绝
             LoanRecord record = loanRecordRepository.findOne(id);
-            int status = handleType == 0 ? ConstantFields.LOAN_STATUS_CONFIRM_NOTRETURN : ConstantFields.LOAN_STATUS_REJECT;
-            record.setStatus(status);
-            loanRecordRepository.save(record);
+            if (handleType == 0) {
+                String nowDate = CommonUtils.generateDateStr();
+                String endTime = CommonUtils.getEndTime(nowDate, record.getDurationMonth());
+                record.setStatus(ConstantFields.LOAN_STATUS_CONFIRM_NOTRETURN);
+                record.setEffectiveTime(nowDate);
+                record.setEndTime(endTime);
+                loanRecordRepository.save(record);
+                List<UserLoan> userLoansByWeidAndCompanyName = userLoanRepository.findUserLoansByWeidAndCompanyName(record.getWeid(), record.getCompanyName());
+                // 已经在这家公司借过款
+                if (userLoansByWeidAndCompanyName != null && userLoansByWeidAndCompanyName.size() != 0) {
+                    UserLoan userLoan = userLoansByWeidAndCompanyName.get(0);
+                    double loanAmount = userLoan.getLoanAmount();
+                    loanAmount += record.getAmount();
+                    userLoan.setLoanAmount(loanAmount);
+                    userLoanRepository.save(userLoan);
+                } else { // 从未在这家公司借过款
+                    userLoanRepository.save(new UserLoan(record.getWeid(), record.getCompanyName(), record.getAmount()));
+                }
+            } else {
+                record.setStatus(ConstantFields.LOAN_STATUS_REJECT);
+                loanRecordRepository.save(record);
+            }
             return SuperResult.ok();
         } catch (Exception e) {
             return SuperResult.fail();
@@ -166,10 +190,7 @@ public class CompanyServiceImpl implements CompanyService {
         List<LoanRecord> allRecords = loanRecordRepository.findAll();
         String today = CommonUtils.generateDateStr();
         for (LoanRecord record : allRecords) {
-            if (record.getStatus() == ConstantFields.LOAN_STATUS_WAITING && today.compareTo(record.getEndTime()) > 0) {
-                record.setStatus(ConstantFields.LOAN_STATUS_REJECT);
-                newRecords.add(record);
-            } else if (record.getStatus() == ConstantFields.LOAN_STATUS_CONFIRM_NOTRETURN && today.compareTo(record.getEndTime()) > 0) {
+            if (record.getStatus() == ConstantFields.LOAN_STATUS_CONFIRM_NOTRETURN && today.compareTo(record.getEndTime()) > 0) {
                 record.setStatus(ConstantFields.LOAN_STATUS_CONFIRM_TIMEOUT);
                 newRecords.add(record);
             }
@@ -237,18 +258,17 @@ public class CompanyServiceImpl implements CompanyService {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             String weid = jsonObject.getString("weid");
             // 获取已借平台
-            double count = loanRecordRepository.findLoanRecordsByWeidAndStatusGreaterThanEqual(weid, 1).size() * 1.0;
-            // 获取待还金额
-            List<LoanRecord> list1 = loanRecordRepository.findLoanRecordsByWeidAndStatus(weid, ConstantFields.LOAN_STATUS_CONFIRM_NOTRETURN);
-            List<LoanRecord> list2 = loanRecordRepository.findLoanRecordsByWeidAndStatus(weid, ConstantFields.LOAN_STATUS_CONFIRM_TIMEOUT);
-            List<LoanRecord> list3 = loanRecordRepository.findLoanRecordsByWeidAndStatus(weid, ConstantFields.LOAN_STATUS_ADDBLACKLIST);
-            List<LoanRecord> allNotPayRecords = new ArrayList<>();
-            allNotPayRecords.addAll(list1);
-            allNotPayRecords.addAll(list2);
-            allNotPayRecords.addAll(list3);
-            double notPayAmount = 0;
-            for (LoanRecord record : allNotPayRecords) {
-                notPayAmount += record.getAmount();
+            List<UserLoan> userLoansByWeid = userLoanRepository.findUserLoansByWeid(weid);
+            double count = 0.0, notPayAmount = 0.0;
+            // 用户有过历史借款记录
+            if (userLoansByWeid != null && userLoansByWeid.size() != 0) {
+                // 计算多头借贷情况
+                count = userLoansByWeid.size() * 1.0;
+                for (UserLoan userLoan : userLoansByWeid) {
+                    double loanAmount = userLoan.getLoanAmount();
+                    double repayAmount = userLoan.getRepayAmount();
+                    notPayAmount += loanAmount - repayAmount;
+                }
             }
             HashMap<String, Double> result = new HashMap<>();
             result.put("multiParityCount", count);

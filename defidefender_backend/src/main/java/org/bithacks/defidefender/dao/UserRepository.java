@@ -9,4 +9,6 @@ public interface UserRepository extends JpaRepository<User, String> {
 
     List<User> findUsersByStatus(int status);
 
+    List<User> findUsersByWeidAndStatus(String weid, int status);
+
 }

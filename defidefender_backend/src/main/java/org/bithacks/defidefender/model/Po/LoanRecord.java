@@ -26,7 +26,7 @@ public class LoanRecord {
     public LoanRecord() {
     }
 
-    public LoanRecord(String weid, String companyName, double amount, int durationMonth, String credentialOwner, int isUserSelf, int isCredentialVerified, double dailyRate, String createdTime, String endTime, int status) {
+    public LoanRecord(String weid, String companyName, double amount, int durationMonth, String credentialOwner, int isUserSelf, int isCredentialVerified, double dailyRate, String createdTime, int status) {
         this.weid = weid;
         this.companyName = companyName;
         this.amount = amount;
@@ -36,7 +36,6 @@ public class LoanRecord {
         this.isCredentialVerified = isCredentialVerified;
         this.dailyRate = dailyRate;
         this.createdTime = createdTime;
-        this.endTime = endTime;
         this.status = status;
     }
 

@@ -56,4 +56,9 @@ public class ConstantFields {
     public static final int LOAN_USER_ISCREDENTIALVERIFIED_YES = 1;
     public static final int LOAN_USER_ISCREDENTIALVERIFIED_NO = 2;
 
+    public static final double LOAN_INITIAL_DAILYRATE = 0.04;
+    public static final int MAX_LOANCOMPANY_COUNT = 5;
+    public static final double LOAN_INITIAL_AMOUNT = 5000.0;
+
+
 }
