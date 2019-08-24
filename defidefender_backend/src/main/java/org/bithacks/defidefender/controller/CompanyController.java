@@ -91,4 +91,36 @@ public class CompanyController {
         SuperResult result = companyService.verifyMultiParityLoan(jsonStr);
         return result;
     }
+
+    @RequestMapping(value = "/requestVerifyMultiParityLoan", method = RequestMethod.POST)
+    public SuperResult requestVerifyMultiParityLoan(@RequestBody String jsonStr) {
+        System.out.println("requestVerifyMultiParityLoan Request");
+        SuperResult result = companyService.requestVerifyMultiParityLoan(jsonStr);
+        return result;
+    }
+
+
+    @RequestMapping(value = "/listRequestVerifyMultiParityLoanRecords", method = RequestMethod.POST)
+    public SuperResult listRequestVerifyMultiParityLoanRecords(@RequestBody String jsonStr) {
+        System.out.println("listRequestVerifyMultiParityLoanRecords Request");
+        SuperResult result = companyService.listRequestVerifyMultiParityLoanRecords(jsonStr);
+        return result;
+    }
+
+
+    @RequestMapping(value = "/hanleRequestVerifyMultiParityLoanRecord", method = RequestMethod.POST)
+    public SuperResult hanleRequestVerifyMultiParityLoanRecord(@RequestBody String jsonStr) {
+        System.out.println("hanleRequestVerifyMultiParityLoanRecord Request");
+        SuperResult result = companyService.hanleRequestVerifyMultiParityLoanRecord(jsonStr);
+        return result;
+    }
+
+
+    @RequestMapping(value = "/listMultiParityLoanInfo", method = RequestMethod.POST)
+    public SuperResult listMultiParityLoanInfo(@RequestBody String jsonStr) {
+        System.out.println("listMultiParityLoanInfo Request");
+        SuperResult result = companyService.listMultiParityLoanInfo(jsonStr);
+        return result;
+    }
+
 }

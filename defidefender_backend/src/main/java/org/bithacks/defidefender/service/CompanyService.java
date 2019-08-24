@@ -27,4 +27,12 @@ public interface CompanyService {
     SuperResult verifyUserAuthenticity(String jsonStr);
 
     SuperResult verifyMultiParityLoan(String jsonStr);
+
+    SuperResult requestVerifyMultiParityLoan(String jsonStr);
+
+    SuperResult listRequestVerifyMultiParityLoanRecords(String jsonStr);
+
+    SuperResult hanleRequestVerifyMultiParityLoanRecord(String jsonStr);
+
+    SuperResult listMultiParityLoanInfo(String jsonStr);
 }

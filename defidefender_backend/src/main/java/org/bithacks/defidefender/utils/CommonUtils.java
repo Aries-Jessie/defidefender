@@ -66,6 +66,15 @@ public class CommonUtils {
         return cptJsonSchemaNew;
     }
 
+    public static String buildCredentialData(String jsonStr) {
+        JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+        JSONObject result = new JSONObject();
+        result.put("claimData", jsonObject);
+        result.put("cptId", 2000000);
+        result.put("issuer", "did:weid:1:0xcaae8d6e1aebb7d77d08e9d07a170254a4c06c23");
+        return result.toJSONString();
+    }
+
 
     public static void writeObjectToFile(CredentialPojo obj, String weid, int type) {
         String path = ConstantFields.CREDENTIAL_DIR + weid.substring(11) + "/";

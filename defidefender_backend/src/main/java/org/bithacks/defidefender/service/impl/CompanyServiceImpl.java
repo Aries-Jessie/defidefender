@@ -4,14 +4,18 @@ import com.alibaba.fastjson.JSONObject;
 import com.webank.weid.protocol.response.ResponseData;
 import org.bithacks.defidefender.contract.Certification;
 import org.bithacks.defidefender.dao.LoanRecordRepository;
+import org.bithacks.defidefender.dao.MultiLoanRecordRepository;
 import org.bithacks.defidefender.dao.RelationRepository;
 import org.bithacks.defidefender.dao.UserLoanRepository;
 import org.bithacks.defidefender.model.Po.LoanRecord;
+import org.bithacks.defidefender.model.Po.MultiLoanRecord;
+import org.bithacks.defidefender.model.Po.Relation;
 import org.bithacks.defidefender.model.Po.UserLoan;
 import org.bithacks.defidefender.model.Vo.BlacklistEntity;
 import org.bithacks.defidefender.service.CommonService;
 import org.bithacks.defidefender.service.CompanyService;
 import org.bithacks.defidefender.service.DIDService;
+import org.bithacks.defidefender.service.MPCService;
 import org.bithacks.defidefender.utils.CommonUtils;
 import org.bithacks.defidefender.utils.ConstantFields;
 import org.bithacks.defidefender.utils.SuperResult;
@@ -43,6 +47,12 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Autowired
     private UserLoanRepository userLoanRepository;
+
+    @Autowired
+    private MultiLoanRecordRepository multiLoanRecordRepository;
+
+    @Autowired
+    private MPCService mpcService;
 
     @Override
     public SuperResult verifyPresentation(String jsonStr) {
@@ -274,6 +284,89 @@ public class CompanyServiceImpl implements CompanyService {
             result.put("multiParityCount", count);
             result.put("notPayAmount", notPayAmount);
             return SuperResult.ok(result);
+        } catch (Exception e) {
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult requestVerifyMultiParityLoan(String jsonStr) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            String requester = jsonObject.getString("requester");
+            int loanRecordId = jsonObject.getIntValue("loanRecordId");
+            String weid = jsonObject.getString("weid");
+            // MPC
+            mpcService.initPaillier();
+            BigInteger ciphereText = mpcService.Encryption(BigInteger.valueOf(weid.hashCode()));
+            List<Relation> relationsByType = relationRepository.findRelationsByType(2);
+            List<MultiLoanRecord> multiLoanRecords = new ArrayList<>();
+            for (Relation relation : relationsByType) {
+                if (!relation.getName().equals(requester)) {
+                    multiLoanRecords.add(new MultiLoanRecord(loanRecordId, requester, relation.getName(), UUID.randomUUID().toString(), weid, ciphereText.toString().substring(0, 20), CommonUtils.generateDateStr(), 0));
+                }
+            }
+            multiLoanRecordRepository.save(multiLoanRecords);
+            return SuperResult.ok();
+        } catch (Exception e) {
+            System.out.println(e);
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult listRequestVerifyMultiParityLoanRecords(String jsonStr) {
+        // 其他机构查询谁向他请求查询多头信息
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            String companyName = jsonObject.getString("companyName");
+            List<MultiLoanRecord> multiLoanRecordsByCompanyName = multiLoanRecordRepository.findMultiLoanRecordsByCompanyName(companyName);
+            return SuperResult.ok(multiLoanRecordsByCompanyName);
+        } catch (Exception e) {
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult hanleRequestVerifyMultiParityLoanRecord(String jsonStr) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            int id = jsonObject.getIntValue("id");
+            int type = jsonObject.getIntValue("type");
+            MultiLoanRecord multiLoanRecord = multiLoanRecordRepository.findOne(id);
+            // 如果请求为拒绝直接回绝
+            if (type == 1) {
+                multiLoanRecord.setStatus(1);
+                multiLoanRecordRepository.save(multiLoanRecord);
+                return SuperResult.ok();
+            }
+            // 查weid是否在这个公司借贷过
+            // 查询接待金额
+            List<UserLoan> userLoansByWeidAndCompanyName = userLoanRepository.findUserLoansByWeidAndCompanyName(multiLoanRecord.getWeid(), multiLoanRecord.getCompanyName());
+            int multiCount = 0;
+            double multiLoanAmount = 0.0;
+            if (userLoansByWeidAndCompanyName != null && userLoansByWeidAndCompanyName.size() != 0) {
+                multiCount = 1;
+                multiLoanAmount = userLoansByWeidAndCompanyName.get(0).getLoanAmount() - userLoansByWeidAndCompanyName.get(0).getRepayAmount();
+            }
+            multiLoanRecord.setMultiCount(multiCount);
+            multiLoanRecord.setMultiLoanAmount(multiLoanAmount);
+            multiLoanRecord.setResponseTime(CommonUtils.generateDateStr());
+            multiLoanRecord.setStatus(1);
+            multiLoanRecordRepository.save(multiLoanRecord);
+            return SuperResult.ok();
+        } catch (Exception e) {
+            return SuperResult.fail();
+        }
+    }
+
+    @Override
+    public SuperResult listMultiParityLoanInfo(String jsonStr) {
+        try {
+            JSONObject jsonObject = JSONObject.parseObject(jsonStr);
+            int recordId = jsonObject.getIntValue("recordId");
+            List<MultiLoanRecord> multiLoanRecordsByLoanRecordId = multiLoanRecordRepository.findMultiLoanRecordsByLoanRecordId(recordId);
+            return SuperResult.ok(multiLoanRecordsByLoanRecordId);
         } catch (Exception e) {
             return SuperResult.fail();
         }
