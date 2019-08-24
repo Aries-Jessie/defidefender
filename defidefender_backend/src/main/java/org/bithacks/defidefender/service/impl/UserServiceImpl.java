@@ -76,8 +76,9 @@ public class UserServiceImpl implements UserService {
             String weid = jsonObject.getString(ConstantFields.USER_SELECTIVECREDENTIAL_WEID);
             JSONObject claimPolicyObject = (JSONObject) jsonObject.get(ConstantFields.USER_SELECTIVECREDENTIAL_CLAIMPOLICYJSON);
             ResponseData<CredentialPojo> response = weIdService.createSelectiveCredential(weid, claimPolicyObject.toJSONString());
-            return SuperResult.ok(response);
+            return SuperResult.ok(response.getResult().getClaim());
         } catch (Exception e) {
+            System.out.println(e);
             return SuperResult.fail();
         }
     }

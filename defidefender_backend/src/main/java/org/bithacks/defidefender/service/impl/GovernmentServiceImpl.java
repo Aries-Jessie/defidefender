@@ -78,7 +78,12 @@ public class GovernmentServiceImpl implements GovernmentService {
             }
             if (updatedStatus == ConstantFields.USER_STAUTS_SUCCESS) {
                 String userJson = JSON.toJSONString(user);
+                JSONObject userJsonStatus = JSONObject.parseObject(userJson);
+                userJsonStatus.remove("status");
+                userJson = userJsonStatus.toJSONString();
+                System.out.println(userJson);
                 String requestCreateCredentialJson = CommonUtils.buildCredentialData(issuer, userJson);
+                System.out.println(requestCreateCredentialJson);
                 createCredential(requestCreateCredentialJson);
             }
             return SuperResult.ok(user);

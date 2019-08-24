@@ -236,10 +236,11 @@ public class DIDServiceImpl implements DIDService {
         CredentialPojo credentialPojo = CommonUtils.getCredentialFromDB(credential);
 //        CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, 0);
         CredentialPojoService credentialPojoService = new CredentialPojoServiceImpl();
-
         // 选择性披露
         ClaimPolicy claimPolicy = new ClaimPolicy();
         claimPolicy.setFieldsToBeDisclosed(claimPolicyJson);
+//        System.out.println(credentialPojo.toJson()+"--------");
+//        System.out.println(claimPolicyJson);
         ResponseData<CredentialPojo> selectiveResponse =
                 credentialPojoService.createSelectiveCredential(credentialPojo, claimPolicy);
         // 保存凭证
