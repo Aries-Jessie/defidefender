@@ -27,7 +27,7 @@ public class CommonController {
         return result;
     }
 
-    @RequestMapping(value = "/getCredential", method = RequestMethod.GET)
+    @RequestMapping(value = "/getCredential", method = RequestMethod.POST)
     public SuperResult getCredential(@RequestBody String jsonStr) {
         System.out.println("Get Credential Request");
         SuperResult result = commonService.getCredential(jsonStr);

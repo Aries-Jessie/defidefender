@@ -1,5 +1,6 @@
 package org.bithacks.defidefender.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.webank.weid.constant.ErrorCode;
 import com.webank.weid.protocol.base.CredentialPojo;
@@ -133,9 +134,12 @@ public class UserServiceImpl implements UserService {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             String companyName = jsonObject.getString("companyName");
             double amount = jsonObject.getDoubleValue("amount");
-            double dailyRate = jsonObject.getDoubleValue("dailyRate");
             int durationMonth = jsonObject.getIntValue("durationMonth");
             String weid = jsonObject.getString("weid");
+            HashMap<String, String> requestMap = new HashMap<>();
+            requestMap.put("weid", weid);
+            String requestStr = JSON.toJSONString(requestMap);
+            double dailyRate = Double.parseDouble(getDailyRate(requestStr).getData().toString());
             String createdTime = CommonUtils.generateDateStr();
             LoanRecord record = loanRecordRepository.save(new LoanRecord(weid, companyName, amount, durationMonth, weid, ConstantFields.LOAN_USER_ISSELF_WAITING, ConstantFields.LOAN_USER_ISCREDENTIALVERIFIED_WAITING, dailyRate, createdTime, ConstantFields.LOAN_STATUS_WAITING));
             return SuperResult.ok(record);

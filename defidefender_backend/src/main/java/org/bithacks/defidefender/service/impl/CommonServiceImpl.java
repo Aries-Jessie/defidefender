@@ -35,6 +35,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CommonServiceImpl implements CommonService {
@@ -108,12 +109,17 @@ public class CommonServiceImpl implements CommonService {
     public SuperResult getCredential(String jsonStr) {
         try {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
-            int id = jsonObject.getIntValue("id");
+            String weid = jsonObject.getString("weid");
+            int type = jsonObject.getIntValue("type");
             // 读取Credential
-            Credential credential = credentialRepository.findOne(id);
-            CredentialPojo credentialPojo = CommonUtils.getCredentialFromDB(credential);
+            List<Credential> credential = credentialRepository.findCredentialsByWeidAndType(weid, type);
+            if (credential == null || credential.size() == 0) {
+                return SuperResult.ok();
+            }
+            CredentialPojo credentialPojo = CommonUtils.getCredentialFromDB(credential.get(0));
+            Map<String, Object> claim = credentialPojo.getClaim();
 //            CredentialPojo credentialPojo = CommonUtils.readObjectFromFile(weid, type);
-            return SuperResult.ok(credentialPojo);
+            return SuperResult.ok(claim);
         } catch (Exception e) {
             return SuperResult.fail();
         }

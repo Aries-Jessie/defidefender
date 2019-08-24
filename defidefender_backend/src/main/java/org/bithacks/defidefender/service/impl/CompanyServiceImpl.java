@@ -73,7 +73,8 @@ public class CompanyServiceImpl implements CompanyService {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             int id = jsonObject.getIntValue("id");
             String weid = jsonObject.getString("weid");
-            String issuer = jsonObject.getString("issuer");
+            String issuer = relationRepository.findRelationsByType(1).get(0).getWeid();
+//            String issuer = jsonObject.getString("issuer");
             int type = jsonObject.getInteger("type");
             int verifyType = jsonObject.getIntValue("verifyType");
             LoanRecord record = loanRecordRepository.findOne(id);
@@ -188,7 +189,7 @@ public class CompanyServiceImpl implements CompanyService {
                 record.setStatus(ConstantFields.LOAN_STATUS_REJECT);
                 loanRecordRepository.save(record);
             }
-            return SuperResult.ok();
+            return SuperResult.ok(record);
         } catch (Exception e) {
             return SuperResult.fail();
         }
@@ -206,7 +207,7 @@ public class CompanyServiceImpl implements CompanyService {
             }
         }
         loanRecordRepository.save(newRecords);
-        return null;
+        return SuperResult.ok();
     }
 
     @Override
@@ -224,7 +225,7 @@ public class CompanyServiceImpl implements CompanyService {
                 TransactionReceipt receipt = certification.addBlacklistEntity(UUID.randomUUID().toString(), record.getWeid(), recordStr, publisher, CommonUtils.generateDateStr()).send();
                 List<Certification.AddBlacklistEntityEventEventResponse> response = certification.getAddBlacklistEntityEventEvents(receipt);
                 if (!response.isEmpty()) {
-                    return SuperResult.ok();
+                    return SuperResult.ok(record);
                 } else {
                     System.out.println(" event log not found, maybe transaction not exec. ");
                     return SuperResult.fail();
@@ -295,6 +296,10 @@ public class CompanyServiceImpl implements CompanyService {
             JSONObject jsonObject = JSONObject.parseObject(jsonStr);
             String requester = jsonObject.getString("requester");
             int loanRecordId = jsonObject.getIntValue("loanRecordId");
+            List<MultiLoanRecord> multiLoanRecordsByLoanRecordId = multiLoanRecordRepository.findMultiLoanRecordsByLoanRecordId(loanRecordId);
+            if (multiLoanRecordsByLoanRecordId != null && multiLoanRecordsByLoanRecordId.size() != 0) {
+                return SuperResult.ok("这条记录您已经调用过请求了");
+            }
             String weid = jsonObject.getString("weid");
             // MPC
             mpcService.initPaillier();
@@ -307,7 +312,7 @@ public class CompanyServiceImpl implements CompanyService {
                 }
             }
             multiLoanRecordRepository.save(multiLoanRecords);
-            return SuperResult.ok();
+            return SuperResult.ok(multiLoanRecords);
         } catch (Exception e) {
             System.out.println(e);
             return SuperResult.fail();
@@ -354,7 +359,7 @@ public class CompanyServiceImpl implements CompanyService {
             multiLoanRecord.setResponseTime(CommonUtils.generateDateStr());
             multiLoanRecord.setStatus(1);
             multiLoanRecordRepository.save(multiLoanRecord);
-            return SuperResult.ok();
+            return SuperResult.ok(multiLoanRecord);
         } catch (Exception e) {
             return SuperResult.fail();
         }

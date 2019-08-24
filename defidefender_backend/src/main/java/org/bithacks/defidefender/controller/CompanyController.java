@@ -108,7 +108,7 @@ public class CompanyController {
     }
 
 
-    @RequestMapping(value = "/hanleRequestVerifyMultiParityLoanRecord", method = RequestMethod.POST)
+    @RequestMapping(value = "/handleRequestVerifyMultiParityLoanRecord", method = RequestMethod.POST)
     public SuperResult hanleRequestVerifyMultiParityLoanRecord(@RequestBody String jsonStr) {
         System.out.println("hanleRequestVerifyMultiParityLoanRecord Request");
         SuperResult result = companyService.hanleRequestVerifyMultiParityLoanRecord(jsonStr);
