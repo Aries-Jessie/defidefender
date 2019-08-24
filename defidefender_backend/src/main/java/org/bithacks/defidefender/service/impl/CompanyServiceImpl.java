@@ -341,9 +341,9 @@ public class CompanyServiceImpl implements CompanyService {
             MultiLoanRecord multiLoanRecord = multiLoanRecordRepository.findOne(id);
             // 如果请求为拒绝直接回绝
             if (type == 1) {
-                multiLoanRecord.setStatus(1);
+                multiLoanRecord.setStatus(2);
                 multiLoanRecordRepository.save(multiLoanRecord);
-                return SuperResult.ok();
+                return SuperResult.ok(multiLoanRecord);
             }
             // 查weid是否在这个公司借贷过
             // 查询接待金额
