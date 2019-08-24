@@ -66,12 +66,12 @@ public class CommonUtils {
         return cptJsonSchemaNew;
     }
 
-    public static String buildCredentialData(String jsonStr) {
+    public static String buildCredentialData(String issuer, String jsonStr) {
         JSONObject jsonObject = JSONObject.parseObject(jsonStr);
         JSONObject result = new JSONObject();
         result.put("claimData", jsonObject);
-        result.put("cptId", 2000000);
-        result.put("issuer", "did:weid:1:0xcaae8d6e1aebb7d77d08e9d07a170254a4c06c23");
+        result.put("cptId", 2000005);
+        result.put("issuer", issuer);
         return result.toJSONString();
     }
 

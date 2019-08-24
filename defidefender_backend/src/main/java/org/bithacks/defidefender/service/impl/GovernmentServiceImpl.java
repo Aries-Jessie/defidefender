@@ -1,5 +1,6 @@
 package org.bithacks.defidefender.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.webank.weid.protocol.base.CredentialPojo;
 import com.webank.weid.protocol.response.ResponseData;
@@ -9,6 +10,7 @@ import org.bithacks.defidefender.dao.RelationRepository;
 import org.bithacks.defidefender.dao.UserRepository;
 import org.bithacks.defidefender.model.Po.Credential;
 import org.bithacks.defidefender.model.Po.IssuedCredential;
+import org.bithacks.defidefender.model.Po.Relation;
 import org.bithacks.defidefender.model.Po.User;
 import org.bithacks.defidefender.service.DIDService;
 import org.bithacks.defidefender.service.GovernmentService;
@@ -69,6 +71,16 @@ public class GovernmentServiceImpl implements GovernmentService {
             int updatedStatus = type == 0 ? ConstantFields.USER_STAUTS_SUCCESS : ConstantFields.USER_STAUTS_FAIL;
             user.setStatus(updatedStatus);
             userRepository.save(user);
+            List<Relation> relationsByType = relationRepository.findRelationsByType(1);
+            String issuer = "did:weid:1:0xcaae8d6e1aebb7d77d08e9d07a170254a4c06c23";
+            if (relationsByType != null && relationsByType.size() != 0) {
+                issuer = relationsByType.get(0).getWeid();
+            }
+            if (updatedStatus == ConstantFields.USER_STAUTS_SUCCESS) {
+                String userJson = JSON.toJSONString(user);
+                String requestCreateCredentialJson = CommonUtils.buildCredentialData(issuer, userJson);
+                createCredential(requestCreateCredentialJson);
+            }
             return SuperResult.ok(user);
         } catch (Exception e) {
             System.out.println(e);
