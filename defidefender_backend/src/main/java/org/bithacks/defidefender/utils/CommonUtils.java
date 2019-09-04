@@ -151,7 +151,7 @@ public class CommonUtils {
     }
 
     public static String generateBlacklistRecord(LoanRecord record) {
-        return "应该于" + record.getEndTime() + "之前还款" + record.getAmount() + "万元，但逾期未换";
+        return "应该于" + record.getEndTime() + "之前还款" + record.getAmount() + "元，但逾期未换";
     }
 
 }
